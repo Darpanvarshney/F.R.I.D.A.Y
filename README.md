@@ -11,4 +11,6 @@ second :- open your command prompt or terminal
 
 third :- open the folder of F.R.I.D.A.Y using cd method
 
-fourth :- run python3 FRIDAY.py
+fourth :- pip install -r requriment.txt
+
+fifth :- run python3 FRIDAY.py
