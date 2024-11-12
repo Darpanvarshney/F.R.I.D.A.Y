@@ -11,7 +11,7 @@ def speak(audio):
     engine.runAndWait()
 
 def latestnews():
-    newsapi = NewsApiClient(api_key='92706bc889af4b2ab1d6a8c1122e0e9d')
+    newsapi = NewsApiClient(api_key='enter you api key ')
     top_headlines = newsapi.get_top_headlines(q=None,
                                           sources=None,
                                           category=None,
