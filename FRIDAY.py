@@ -1,3 +1,4 @@
+import os
 import pyautogui
 from email.mime import audio
 from pyautogui import sleep
@@ -16,14 +17,14 @@ import wikipedia as googleScrap
 import json 
 import pickle 
 import numpy as np 
-from intro import gif
 import nltk 
 from nltk.stem import WordNetLemmatizer
-from keras.models import load_model
+from keras.models import load_model # type: ignore
 from calu import calu
 from pygame import mixer
 from plyer import notification
 import healthadviser
+import image_generator
 
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
@@ -68,11 +69,11 @@ def get_response(intents_list, intents_json):
             break 
     return result 
 
-gif
+
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
-engine.setProperty('voice',voices[4].id)
+engine.setProperty('voice',voices[1].id)
 voicespeed = 150
 engine.setProperty('rate', voicespeed)
 
@@ -92,8 +93,8 @@ def wishMe():
     sleep(0.5) 
     
  elif hour >= 12 and hour < 18:
-  speak("good afternoon sir")
-  sleep(0.5)
+    speak("good afternoon sir")
+    sleep(0.5)
     
  else:
   speak("good evening sir") 
@@ -290,7 +291,26 @@ while True:
          query = query.replace("open","")
          query = query.replace("website","")
          wb.open(query)
-         
+
+      elif 'generate image ' in query or 'create image' in query or ' create an image' in query or 'create a image' in query or 'generate a image ' in query or 'generate an image' in query:
+         query = query.replace('friday','')
+         query = query.replace('generate image','')
+         query = query.replace('create image','')
+         pipe = image_generator.load_model()
+         prompt = query
+         generated_image_file = image_generator.generate_image(pipe, prompt, output_file=f"generated_image\{random.randrange(0,99999999)}.png")
+         image_generator.resize_image(generated_image_file, f"generated_image\{random.randrange(0,99999999)}.png", new_width=3840, new_height=2160)
+         img_number = random.randrange(0,99999999)
+         image_generator.upscale_image_opencv(generated_image_file,f"generated_image\{img_number}.png", scale=4)
+         sleep(1)
+         pyautogui.press("super")
+         sleep(0.5)
+         pyautogui.typewrite(f"{img_number}.png")
+         sleep(0.5)
+         pyautogui.press("enter")
+         speak("opening generated image") 
+
+
       elif 'close tab' in query:
          pyautogui.hotkey("crtl","w")
 

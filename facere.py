@@ -1,43 +1,72 @@
-import threading
 import cv2
-from deepface import DeepFace
-from scipy.datasets import face
+import face_recognition
+import pyttsx3
+import random
+
+engine = pyttsx3.init('sapi5')
+voices = engine.getProperty('voices')
+engine.setProperty('voice',voices[0].id)
+voicespeed = 150
+engine.setProperty('rate', voicespeed)
+
+def speak(audio) :
+  engine.say(audio)
+  engine.runAndWait()
+
+authorized_images = [  #here enter the img that have permit to access
+    ]
+
+known_face_encodings = []
+known_face_names = []
+
+for img_path in authorized_images:
+    image = face_recognition.load_image_file(img_path)
+    encoding = face_recognition.face_encodings(image)[0]
+    known_face_encodings.append(encoding)
+    known_face_names.append(img_path)  
+
+face_locations = []
+face_encodings = []
+access_granted = False
 
 
-cam = cv2.VideoCapture(0,cv2.CAP_DSHOW)
-cam.set(cv2.CAP_PROP_GIGA_FRAME_WIDTH_MAX , 600)
-cam.set(cv2.CAP_PROP_GIGA_FRAME_HEIGH_MAX , 500)
+video_capture = cv2.VideoCapture(0)
 
-count = 0 
-face_match  = False
 
-reference = cv2.imread("img\IMG_20240801_093457.jpg")
+    
+ret, frame = video_capture.read()
 
-def check(frame):
-    global face_match
-    try:
-        if DeepFace.verify(frame,reference.copy())['verified']:
-              face_match = True
+    
+small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+
+    
+rgb_small_frame = small_frame[:, :, ::-1]
+
+    
+face_locations = face_recognition.face_locations(rgb_small_frame)
+face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+print("done before loop")
+
+for face_encoding in face_encodings:
+        print("done after loop")
+        matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+
+        name = "Unknown"
+        s_name = ""
+        
+        if True in matches:
+            first_match_index = matches.index(True)
+            name = known_face_names[first_match_index] 
+            access_granted = True
+            print("Access Granted ")
+            speak("welcome back")
+           
         else:
-             face_match = False
-    except ValueError:
-         face_match = False         
+            access_granted = False
+            print("Access Denied")
+            speak("who are you")
+            speak("identify yourself")
+            cv2.imwrite(f"{random.randint(1,9999999999999)}.jpg",frame)
 
-while True:
-    ret , frame  = cam.read()
-    if ret :
-        if count%30 == 0:
-                try:
-                     threading.Thread(target=check,args=(frame.copy(),)).start()
-                except ValueError :
-                     pass
-        count+=1
-        if face_match:
-             cv2.putText(frame,"match",(20,450),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
-        else:
-             cv2.putText(frame,"NO match",(20,450),cv2.FONT_HERSHEY_SIMPLEX,2,(0,0,255),3)
-        cv2.imshow("video",frame)
-    key = cv2.waitKey(1)
-    if key == ord("q"):
-        break
-cv2.destroyAllWindows() 
+video_capture.release()
+cv2.destroyAllWindows()
