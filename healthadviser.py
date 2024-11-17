@@ -4,7 +4,7 @@ from googletrans import Translator
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
-engine.setProperty('voice',voices[4].id)
+engine.setProperty('voice',voices[1].id)
 voicespeed = 150
 engine.setProperty('rate', voicespeed)
 
