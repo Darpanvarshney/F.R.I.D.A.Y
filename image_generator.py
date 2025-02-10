@@ -21,7 +21,7 @@ def load_model():
     return pipe
 
 
-def generate_image(pipe, prompt, output_file="generated_image.png", height=512, width=512, guidance_scale=20, num_inference_steps=999, use_half_precision=True):
+def generate_image(pipe, prompt, output_file="generated_image.png", height=512, width=512, guidance_scale=8, num_inference_steps=200, use_half_precision=True):
    
     if use_half_precision:
         pipe = pipe.to(torch.float16)
@@ -52,10 +52,3 @@ def upscale_image_opencv(input_file, output_file, scale=2, new_width=3840, new_h
     
     cv2.imwrite(output_file, upscaled_img)
     print(f"Image upscaled by {scale}x and saved as {output_file}")
-
-pipe = load_model()
-prompt = ""
-generated_image_file =generate_image(pipe, prompt, output_file=f"generated_image\{random.randrange(0,99999999)}.png")
-resize_image(generated_image_file, f"generated_image\{random.randrange(0,99999999)}.png", new_width=3840, new_height=2160)
-img_number = random.randrange(0,99999999)
-upscale_image_opencv(generated_image_file,f"generated_image\{img_number}.png", scale=4)

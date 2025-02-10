@@ -1,3 +1,4 @@
+import code
 import os
 import pyautogui
 from email.mime import audio
@@ -25,6 +26,7 @@ from pygame import mixer
 from plyer import notification
 import healthadviser
 import image_generator
+import ollama
 
 lemmatizer = WordNetLemmatizer()
 intents = json.loads(open("intents.json").read())
@@ -163,18 +165,10 @@ while True:
         except:
             speak("No speakable output available")    
 
-      if 'coding' in query or 'code' in query:
-            speak("ok give me time I am running your command")
-            pyautogui.press("super")
-            pyautogui.typewrite("chrome")
-            sleep(0.5)
-            pyautogui.press("enter")
-            sleep(0.5)
-            pyautogui.press("super")
-            pyautogui.typewrite("vs code")
-            sleep(0.5)
-            pyautogui.press("enter")
-            sleep(0.5)
+      if 'write code' in query or 'code' in query:
+          code_query = query
+          generated_code = ollama.generate(prompt=code_query,model="codellama:13b")
+          print(generated_code)
 
       elif 'open chrome' in query:
         speak("opening chrome")
